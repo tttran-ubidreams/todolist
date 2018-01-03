@@ -13,8 +13,8 @@ import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 
-const PORT = 5000;
-const URL_SUBSCRIPTION = 'ws://localhost:5000/subscriptions';
+const PORT = 4000;
+const URL_SUBSCRIPTION = `ws://localhost:${PORT}/subscriptions`;
 const server = express();
 
 server.use('*', cors({ origin: 'http://localhost:3000' }));

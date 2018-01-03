@@ -2,6 +2,7 @@ import React from 'react';
 import {graphql, compose} from 'react-apollo';
 
 import {addTodoMutation} from '../gql/mutations';
+import {getTodosQuery} from '../gql/queries';
 
 class AddTodo extends React.Component {
   _handleAddTodo = (event) => {
@@ -20,7 +21,7 @@ class AddTodo extends React.Component {
     });
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props);
 
     this.state = {todoText: ''};
@@ -30,7 +31,7 @@ class AddTodo extends React.Component {
     return (
       <div>
         <form onSubmit={this._handleAddTodo}>
-          <input value={this.state.todoText} onChange={this._handleOnChange} />
+          <input value={this.state.todoText} onChange={this._handleOnChange}/>
           <button type="button" onClick={this._handleAddTodo}>Add</button>
         </form>
       </div>
@@ -40,7 +41,22 @@ class AddTodo extends React.Component {
 
 const mapResultsToProps = ({data, mutate}) => {
   return {
-    submit: (text) => mutate({ variables: { text } })
+    submit: (text) => mutate({
+      variables: {text},
+      update: (store, {data: {addTodo}}) => {
+        const data = store.readQuery({query: getTodosQuery});
+
+        data.getTodos.push(addTodo);
+        store.writeQuery({query: getTodosQuery, data});
+      },
+      optimisticResponse: {
+        addTodo: {
+          name: text,
+          id: Math.round(Math.random() * -1000000),
+          __typename: 'Todo',
+        },
+      }
+    })
   };
 };
 

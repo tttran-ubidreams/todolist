@@ -3,8 +3,9 @@ import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import { SubscriptionClient, addGraphQLSubscriptions } from 'subscriptions-transport-ws';
 import thunk from 'redux-thunk';
 
-const URL = 'http://localhost:5000/graphql';
-const URL_SUBSCRIPTION = 'ws://localhost:5000/subscriptions';
+const PORT = 4000;
+const URL = `http://localhost:${PORT}/graphql`;
+const URL_SUBSCRIPTION = `ws://localhost:${PORT}/subscriptions`;
 
 const networkInterface = createNetworkInterface({
   uri: URL,
