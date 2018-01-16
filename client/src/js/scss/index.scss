@@ -1,0 +1,30 @@
+.main {
+  .addItemForm {
+    width: 400px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    margin: auto;
+  }
+
+  .todoList {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .todoItem {
+      min-width: 400px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .completedItem {
+      label {
+        text-decoration: line-through;
+      }
+    }
+  }
+}

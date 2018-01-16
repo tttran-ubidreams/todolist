@@ -1,5 +1,6 @@
 import React from 'react';
 import {graphql, compose} from 'react-apollo';
+import {FormControl, Button} from 'react-bootstrap';
 
 import {addTodoMutation} from '../gql/mutations';
 import {getTodosQuery} from '../gql/queries';
@@ -30,9 +31,9 @@ class AddTodo extends React.Component {
   render() {
     return (
       <div>
-        <form onSubmit={this._handleAddTodo}>
-          <input value={this.state.todoText} onChange={this._handleOnChange}/>
-          <button type="button" onClick={this._handleAddTodo}>Add</button>
+        <form className="addItemForm" onSubmit={this._handleAddTodo}>
+          <FormControl type="text" value={this.state.todoText} onChange={this._handleOnChange}/>
+          <Button type="submit">Add</Button>
         </form>
       </div>
     );
@@ -51,7 +52,7 @@ const mapResultsToProps = ({data, mutate}) => {
       },
       optimisticResponse: {
         addTodo: {
-          name: text,
+          text: text,
           id: Math.round(Math.random() * -1000000),
           __typename: 'Todo',
         },

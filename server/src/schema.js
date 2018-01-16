@@ -6,7 +6,7 @@ const typeDefs = `
 type Todo {
   id: ID!
   text: String!
-  done: Boolean
+  completed: Boolean
 }
 
 type Query {
@@ -16,6 +16,13 @@ type Query {
 
 type Mutation {
   addTodo(text: String!): Todo 
+  removeTodo(id: ID!): Todo
+  toggleTodo(id: ID!): Todo
+}
+
+type Subscription {
+  todoAdded: Todo
+  todoToggled: Todo
 }
 `;
 

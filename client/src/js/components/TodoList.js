@@ -1,19 +1,53 @@
 import React from 'react';
-import {graphql} from 'react-apollo';
+import {connect} from 'react-redux';
+import {graphql, compose} from 'react-apollo';
 
-import {getTodosQuery} from '../gql/queries'
+import {Checkbox, Glyphicon, Button} from 'react-bootstrap'
+import classNames from 'classnames';
+
+import {deleteTodo} from '../actions/action'
+
+import {getTodosQuery, onTodoAddedSubscription, onTodoToggledSubscription} from '../gql/queries'
+import {removeTodoMutation, toggleTodoMutation} from '../gql/mutations'
 
 class TodoList extends React.Component {
+  _handleRemoveTodo = (todo) => {
+    this.props.removeTodo(todo);
+  };
+
+  _handleToggleTodo = (todo) => {
+    this.props.toggleTodo(todo);
+  };
+
+  componentDidMount() {
+    this.props.subscribeToNewTodos();
+    this.props.subscribeTodoToggle();
+  }
 
   render() {
     let {todos} = this.props;
 
     return (
-      <div>
+      <div className="todoList container">
         {
           todos && todos.map(todo => {
+            let itemCl = {
+              "todoItem": true,
+              'completedItem': todo.completed
+            };
+
             return (
-              <li key={todo.id}>{todo.text}</li>
+              <div key={todo.id} className={classNames(itemCl)}>
+                <Checkbox
+                  checked={todo.completed}
+                  onClick={this._handleToggleTodo.bind(this, todo)}
+                >
+                  {todo.text}
+                </Checkbox>
+                <Button onClick={this._handleRemoveTodo.bind(this, todo)}>
+                  <Glyphicon glyph="remove"/>
+                </Button>
+              </div>
             );
           })
         }
@@ -23,23 +57,81 @@ class TodoList extends React.Component {
 }
 
 
+const getTodos = (props) => {
+  let {data} = props;
 
-const mapResultsToProps = ({data}) => {
-  console.log(data)
   return {
     loading: data.loading,
     error: data.error,
     todos: data.getTodos,
+    subscribeToNewTodos: params => {
+      return data.subscribeToMore({
+        document: onTodoAddedSubscription,
+        variables: {},
+        updateQuery: (prev, {subscriptionData}) => {
+          if (!subscriptionData.data) {
+            return prev;
+          }
+
+          const newFeedItem = subscriptionData.data.todoAdded;
+          return {...prev, getTodos: [...prev.getTodos, newFeedItem]}
+        }
+      });
+    },
+    subscribeTodoToggle: params => {
+      return data.subscribeToMore({
+        document: onTodoToggledSubscription,
+        variables: {},
+        updateQuery: (prev, {subscriptionData}) => {
+          if (!subscriptionData.data) {
+            return prev;
+          }
+
+          const newFeedItem = subscriptionData.data.todoToggled;
+          return {...prev, getTodos: [...prev.getTodos, newFeedItem]}
+        }
+      });
+    }
   };
 };
 
-const mapPropsToOptions = () => {
+const removeTodo = ({data, mutate}) => {
   return {
-    pollInterval: 5000,
+    removeTodo: (todo) => mutate({
+      variables: {id: todo.id},
+      update: (store) => {
+        const data = store.readQuery({query: getTodosQuery});
+
+        data.getTodos = data.getTodos.filter(item => item.id != todo.id);
+        store.writeQuery({query: getTodosQuery, data});
+      }
+    })
   };
 };
 
-export default graphql(getTodosQuery, {
-  props: mapResultsToProps,
-  options: mapPropsToOptions,
-})(TodoList);
+const toggleTodo = ({data, mutate}) => {
+  return {
+    toggleTodo: (todo) => mutate({
+      variables: {id: todo.id},
+      update: (store, props) => {
+        const data = store.readQuery({query: getTodosQuery});
+
+        data.getTodos = data.getTodos.map(item => {
+          if (item.id == todo.id) {
+            return {...item, completed: !item.completed}
+          }
+
+          return item
+        });
+
+        store.writeQuery({query: getTodosQuery, data});
+      }
+    })
+  };
+};
+
+export default compose(
+  graphql(getTodosQuery, {props: getTodos}),
+  graphql(removeTodoMutation, {props: removeTodo}),
+  graphql(toggleTodoMutation, {props: toggleTodo})
+)(TodoList);

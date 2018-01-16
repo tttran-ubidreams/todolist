@@ -3,27 +3,34 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "apollo-client": "^1.1.1",
+    "apollo-cache-inmemory": "^1.1.5",
+    "apollo-client": "^2.0.1",
+    "apollo-client-preset": "^1.0.6",
+    "apollo-link": "^1.0.7",
+    "apollo-link-state": "^0.3.1",
+    "apollo-link-ws": "^1.0.4",
     "apollo-test-utils": "^0.1.1",
+    "apollo-utilities": "^1.0.4",
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "false": "0.0.4",
     "graphql": "^0.10.1",
     "graphql-tools": "^0.10.0",
+    "node-sass-chokidar": "0.0.3",
     "react": "^15.4.2",
     "react-apollo": "^1.1.2",
     "react-bootstrap": "^0.31.5",
     "react-dom": "^15.4.2",
     "react-intl": "^2.4.0",
     "react-router-dom": "^4.0.0",
-    "subscriptions-transport-ws": "^0.7.3"
+    "subscriptions-transport-ws": "^0.9.5"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
+    "babel-plugin-react-intl": "^2.3.1",
     "babel-preset-es2015": "^6.24.0",
     "babel-preset-stage-0": "^6.22.0",
-    "babel-plugin-react-intl": "^2.3.1",
     "react-scripts": "0.9.3",
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1",
@@ -34,6 +41,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build-css": "node-sass-chokidar src/ -o src/",
+    "watch-css": "npm run build-css && node-sass-chokidar src/js/scss -o src/js/css --watch --recursive"
   }
 }
